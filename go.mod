@@ -6,6 +6,8 @@ go 1.24.2
 
 toolchain go1.24.3
 
+replace github.com/livekit/protocol v1.12.1-0.20240321094538-0d9caadf760e => github.com/Hullovv/protocol v0.0.1
+
 require (
 	cloud.google.com/go/storage v1.55.0
 	github.com/Azure/azure-storage-blob-go v0.15.0
