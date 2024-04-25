@@ -26,15 +26,14 @@ import (
 	"github.com/go-gst/go-gst/gst"
 	"go.uber.org/zap"
 
-	"github.com/livekit/egress/pkg/config"
-	"github.com/livekit/egress/pkg/errors"
-	"github.com/livekit/egress/pkg/gstreamer"
-	"github.com/livekit/egress/pkg/ipc"
-	"github.com/livekit/egress/pkg/pipeline/builder"
-	"github.com/livekit/egress/pkg/pipeline/sink"
-	"github.com/livekit/egress/pkg/pipeline/source"
-	"github.com/livekit/egress/pkg/stats"
-	"github.com/livekit/egress/pkg/types"
+	"github.com/Hullovv/egress/pkg/config"
+	"github.com/Hullovv/egress/pkg/errors"
+	"github.com/Hullovv/egress/pkg/gstreamer"
+	"github.com/Hullovv/egress/pkg/pipeline/builder"
+	"github.com/Hullovv/egress/pkg/pipeline/sink"
+	"github.com/Hullovv/egress/pkg/pipeline/source"
+	"github.com/Hullovv/egress/pkg/stats"
+	"github.com/Hullovv/egress/pkg/types"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/tracer"
@@ -112,12 +111,33 @@ func New(ctx context.Context, conf *config.PipelineConfig, ipcServiceClient ipc.
 	return c, nil
 }
 
+func printElementInfo(element *gst.Element) {
+	// Получаем шаблоны пэдов (портов) элемента
+	templates := element.GetPadTemplates()
+	for _, t := range templates {
+		logger.Infow("Pad template: %s, Direction: %v\n", t.Name(), t.Direction())
+	}
+
+	// Получаем активные пэды элемента
+	pads, err := element.GetPads()
+	if err != nil {
+		logger.Infow("PadError: %s,", err)
+	}
+	for _, p := range pads {
+		// peer := p.Peer()
+		// if peer != nil {
+		//     fmt.Printf("Pad: %s, Peer: %s\n", p) //peer
+		// } else {
+		logger.Infow("Pad: %s, Peer: <none>\n", p)
+		// }
+	}
+}
+
 func (c *Controller) BuildPipeline() error {
 	p, err := gstreamer.NewPipeline(pipelineName, c.Latency.PipelineLatency, c.callbacks)
 	if err != nil {
 		return errors.ErrGstPipelineError(err)
 	}
-
 	p.SetWatch(c.messageWatch)
 	p.AddOnStop(func() error {
 		c.stopped.Break()
@@ -130,11 +150,13 @@ func (c *Controller) BuildPipeline() error {
 		})
 	}
 
+	logger.Infow("AudioEnabled:: ", c.AudioEnabled)
 	if c.AudioEnabled {
 		if err = builder.BuildAudioBin(p, c.PipelineConfig); err != nil {
 			return err
 		}
 	}
+	logger.Infow("VideoEnabled:: ", c.VideoEnabled)
 	if c.VideoEnabled {
 		if err = builder.BuildVideoBin(p, c.PipelineConfig); err != nil {
 			return err
@@ -151,11 +173,17 @@ func (c *Controller) BuildPipeline() error {
 		}
 	}
 
+	for _, el := range p.Elements {
+		printElementInfo(el)
+	}
+
 	if err = p.Link(); err != nil {
+		logger.Infow("Error start:: ", err)
 		return err
 	}
 
 	c.p = p
+	logger.Infow("Pipeline:: ", p)
 	close(c.callbacks.BuildReady)
 	return nil
 }
@@ -163,6 +191,7 @@ func (c *Controller) BuildPipeline() error {
 func (c *Controller) Run(ctx context.Context) *livekit.EgressInfo {
 	ctx, span := tracer.Start(ctx, "Pipeline.Run")
 	defer span.End()
+	logger.Infow("PipelineContext:: ", ctx)
 
 	defer c.Close()
 
@@ -178,7 +207,7 @@ func (c *Controller) Run(ctx context.Context) *livekit.EgressInfo {
 	// wait until room is ready
 	start := c.src.StartRecording()
 	if start != nil {
-		logger.Debugw("waiting for start signal")
+		logger.Infow("waiting for start signal")
 		select {
 		case <-c.stopped.Watch():
 			c.src.Close()

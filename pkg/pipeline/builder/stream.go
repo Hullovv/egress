@@ -22,11 +22,11 @@ import (
 	"github.com/go-gst/go-gst/gst"
 	"go.uber.org/atomic"
 
-	"github.com/livekit/egress/pkg/config"
-	"github.com/livekit/egress/pkg/errors"
-	"github.com/livekit/egress/pkg/gstreamer"
+	"github.com/Hullovv/egress/pkg/config"
+	"github.com/Hullovv/egress/pkg/errors"
+	"github.com/Hullovv/egress/pkg/gstreamer"
+	"github.com/Hullovv/egress/pkg/types"
 	"github.com/livekit/egress/pkg/logging"
-	"github.com/livekit/egress/pkg/types"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
 )
@@ -58,7 +58,7 @@ func BuildStreamBin(pipeline *gstreamer.Pipeline, p *config.PipelineConfig, o *c
 	var err error
 	switch o.OutputType {
 	case types.OutputTypeRTMP:
-		mux, err = gst.NewElement("flvmux")
+		mux, err = gst.NewElementWithName("flvmux", "flvmux")
 		if err != nil {
 			return nil, errors.ErrGstPipelineError(err)
 		}
@@ -90,7 +90,7 @@ func BuildStreamBin(pipeline *gstreamer.Pipeline, p *config.PipelineConfig, o *c
 		return nil, err
 	}
 
-	tee, err := gst.NewElement("tee")
+	tee, err := gst.NewElementWithName("tee", "tee")
 	if err != nil {
 		return nil, errors.ErrGstPipelineError(err)
 	}

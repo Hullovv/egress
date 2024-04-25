@@ -17,8 +17,8 @@ package config
 import (
 	"net/url"
 
-	"github.com/livekit/egress/pkg/errors"
-	"github.com/livekit/egress/pkg/types"
+	"github.com/Hullovv/egress/pkg/errors"
+	"github.com/Hullovv/egress/pkg/types"
 	"github.com/livekit/protocol/egress"
 	"github.com/livekit/protocol/livekit"
 )

@@ -17,7 +17,7 @@ package handler
 import (
 	"context"
 
-	"github.com/livekit/egress/pkg/errors"
+	"github.com/Hullovv/egress/pkg/errors"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/tracer"
 )

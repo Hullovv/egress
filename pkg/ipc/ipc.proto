@@ -15,7 +15,7 @@
 syntax = "proto3";
 
 package ipc;
-option go_package = "github.com/livekit/egress/pkg/ipc";
+option go_package = "github.com/Hullovv/egress/pkg/ipc";
 
 import "google/protobuf/empty.proto";
 import "livekit_egress.proto";

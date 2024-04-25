@@ -21,9 +21,9 @@ import (
 	"github.com/frostbyte73/core"
 	"google.golang.org/grpc"
 
-	"github.com/livekit/egress/pkg/config"
-	"github.com/livekit/egress/pkg/ipc"
-	"github.com/livekit/egress/pkg/pipeline"
+	"github.com/Hullovv/egress/pkg/config"
+	"github.com/Hullovv/egress/pkg/ipc"
+	"github.com/Hullovv/egress/pkg/pipeline"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"

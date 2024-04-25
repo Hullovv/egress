@@ -26,9 +26,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/livekit/egress/pkg/config"
-	"github.com/livekit/egress/pkg/pipeline/sink/m3u8"
-	"github.com/livekit/egress/pkg/types"
+	"github.com/Hullovv/egress/pkg/config"
+	"github.com/Hullovv/egress/pkg/pipeline/sink/m3u8"
+	"github.com/Hullovv/egress/pkg/types"
 	"github.com/livekit/protocol/livekit"
 )
 

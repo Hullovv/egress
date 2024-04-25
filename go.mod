@@ -1,4 +1,4 @@
-module github.com/livekit/egress
+module github.com/Hullovv/egress
 
 replace github.com/go-gst/go-gst => github.com/livekit/gst-go v0.0.0-20250624183147-d78381a7d664
 
@@ -99,6 +99,7 @@ require (
 	github.com/go-jose/go-jose/v3 v3.0.4 // indirect
 	github.com/go-json-experiment/json v0.0.0-20250417205406-170dfdcf87d1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.4.0 // indirect

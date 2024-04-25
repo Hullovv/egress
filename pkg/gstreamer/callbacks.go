@@ -17,8 +17,8 @@ package gstreamer
 import (
 	"sync"
 
-	"github.com/livekit/egress/pkg/config"
-	"github.com/livekit/egress/pkg/errors"
+	"github.com/Hullovv/egress/pkg/config"
+	"github.com/Hullovv/egress/pkg/errors"
 )
 
 type Callbacks struct {

@@ -19,6 +19,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jaypipes/ghw"
+	"github.com/jaypipes/ghw/pkg/gpu"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/logger/medialogutils"
 	"github.com/livekit/protocol/redis"
@@ -46,6 +48,7 @@ type BaseConfig struct {
 	EnableRoomCompositeSDKSource bool           `yaml:"enable_room_composite_sdk_source"` // attempt to render supported audio only room composite use cases using the SDK source instead of Chrome. This option will be removed when this becomes the default behavior eventually.
 	IOCreateTimeout              time.Duration  `yaml:"io_create_timeout"`                // timeout for CreateEgress calls
 	IOUpdateTimeout              time.Duration  `yaml:"io_update_timeout"`                // timeout for UpdateEgress calls
+	UseGpu                       *Gpu           `yaml:"enable_use_gpu"`
 
 	SessionLimits `yaml:"session_limits"` // session duration limits
 	StorageConfig *StorageConfig          `yaml:"storage,omitempty"` // storage config
@@ -71,6 +74,11 @@ type DebugConfig struct {
 	EnableStreamLogging bool             `yaml:"enable_stream_logging"` // log bytes and keyframes for each stream
 	EnableChromeLogging bool             `yaml:"enable_chrome_logging"` // log all chrome console events
 	StorageConfig       `yaml:",inline"` // upload config (S3, Azure, GCP, or AliOSS)
+}
+
+type Gpu struct {
+	Enabled bool `yaml:"enabled"`
+	GpuId   int  `yaml:"gpu_id"`
 }
 
 type LatencyConfig struct {
@@ -113,4 +121,30 @@ func (c *BaseConfig) initLogger(values ...interface{}) error {
 	logger.SetLogger(l, "egress")
 	lksdk.SetLogger(medialogutils.NewOverrideLogger(nil))
 	return nil
+}
+
+func (c *BaseConfig) СheckGpu() bool {
+	logger.Infow("Start check gpu")
+	var (
+		check bool
+		err   error
+		gpu_c *gpu.Info
+	)
+	if c.UseGpu.Enabled {
+		logger.Infow("Start check gpu TRUE")
+		gpu_c, err = ghw.GPU()
+		logger.Infow("Start check gpu GPU::", gpu_c)
+		if err != nil {
+			logger.Infow("Start check gpu ERROR:: ", err)
+			return false
+		}
+		if len(gpu_c.GraphicsCards) != 0 {
+			return true
+		} else {
+			// c.UseGpu.Enabled = false
+			return check
+		}
+	} else {
+		return check
+	}
 }

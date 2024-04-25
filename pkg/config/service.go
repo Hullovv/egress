@@ -21,7 +21,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/livekit/egress/pkg/errors"
+	"github.com/Hullovv/egress/pkg/errors"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
 )

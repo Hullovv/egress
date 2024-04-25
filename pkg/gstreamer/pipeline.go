@@ -20,7 +20,7 @@ import (
 	"github.com/go-gst/go-glib/glib"
 	"github.com/go-gst/go-gst/gst"
 
-	"github.com/livekit/egress/pkg/errors"
+	"github.com/Hullovv/egress/pkg/errors"
 	"github.com/livekit/protocol/logger"
 )
 
@@ -66,6 +66,7 @@ func (p *Pipeline) AddSourceBin(src *Bin) error {
 }
 
 func (p *Pipeline) AddSinkBin(sink *Bin) error {
+	logger.Infow("AddSinkBinPipeline:", sink)
 	if p.elementsAdded {
 		return errors.ErrWrongHierarchy
 	}

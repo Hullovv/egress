@@ -21,9 +21,9 @@ import (
 
 	"github.com/go-gst/go-gst/gst"
 
-	"github.com/livekit/egress/pkg/config"
-	"github.com/livekit/egress/pkg/errors"
-	"github.com/livekit/egress/pkg/gstreamer"
+	"github.com/Hullovv/egress/pkg/config"
+	"github.com/Hullovv/egress/pkg/errors"
+	"github.com/Hullovv/egress/pkg/gstreamer"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 )

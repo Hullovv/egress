@@ -1,0 +1,22 @@
+ARG GSTREAMER_VERSION
+
+FROM hullovv/livekit-gstreamer-base
+
+ENV DEBUG=true
+ENV OPTIMIZATIONS=false
+
+COPY compile /
+COPY compile-rs /
+
+RUN pip3 install tomli
+
+RUN /compile
+RUN /compile-rs
+
+FROM ubuntu:22.04
+
+COPY install-dependencies /
+
+RUN /install-dependencies
+
+COPY --from=0 /compiled-binaries /

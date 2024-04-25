@@ -15,14 +15,13 @@
 package sink
 
 import (
-	"go.uber.org/atomic"
-
-	"github.com/livekit/egress/pkg/config"
+	"github.com/Hullovv/egress/pkg/config"
+	"github.com/Hullovv/egress/pkg/gstreamer"
+	"github.com/Hullovv/egress/pkg/stats"
+	"github.com/Hullovv/egress/pkg/types"
 	"github.com/livekit/egress/pkg/errors"
-	"github.com/livekit/egress/pkg/gstreamer"
-	"github.com/livekit/egress/pkg/stats"
-	"github.com/livekit/egress/pkg/types"
 	"github.com/livekit/protocol/logger"
+	"go.uber.org/atomic"
 )
 
 type Sink interface {
