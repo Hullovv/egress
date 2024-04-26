@@ -33,3 +33,43 @@ RUN wget https://libnice.freedesktop.org/releases/libnice-$LIBNICE_VERSION.tar.g
     tar xfz libnice-$LIBNICE_VERSION.tar.gz && \
     rm libnice-$LIBNICE_VERSION.tar.gz && \
     mv libnice-$LIBNICE_VERSION libnice
+
+# RUN  wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin && \
+#     mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600 && \
+#     wget https://developer.download.nvidia.com/compute/cuda/12.0.0/local_installers/cuda-repo-ubuntu2204-12-0-local_12.0.0-525.60.13-1_amd64.deb && \
+#     dpkg -i cuda-repo-ubuntu2204-12-0-local_12.0.0-525.60.13-1_amd64.deb && \
+#     cp /var/cuda-repo-ubuntu2204-12-0-local/cuda-*-keyring.gpg /usr/share/keyrings/ && \
+#     apt-get update && \
+#     apt-get -y install cuda
+RUN \
+    DIR=/tmp/cuda && \
+    mkdir -p ${DIR} && \
+    cd ${DIR} && \
+    curl -sL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin > cuda-ubuntu2204.pin && \
+    mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600 && \
+    apt-key del 7fa2af80 && \
+    apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub && \
+    add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /" && \
+    apt-get update && \
+    apt-get -y install cuda-12-4 tensorrt libnvinfer-dev libnvinfer-dev=8.6.1.6-1+cuda12.0
+# RUN apt-get install -y libnvinfer8=8.6.1.6-1+cuda12.0 libnvinfer-plugin8=8.6.1.6-1+cuda12.0 libnvparsers8=8.6.1.6-1+cuda12.0 \
+#     libnvonnxparsers8=8.6.1.6-1+cuda12.0 libnvinfer-bin=8.6.1.6-1+cuda12.0 libnvinfer-dev=8.6.1.6-1+cuda12.0 \
+#     libnvinfer-plugin-dev=8.6.1.6-1+cuda12.0 libnvparsers-dev=8.6.1.6-1+cuda12.0 libnvonnxparsers-dev=8.6.1.6-1+cuda12.0 \
+#     libnvinfer-samples=8.6.1.6-1+cuda12.0 libcudnn8=8.9.4.25-1+cuda12.2 libcudnn8-dev=8.9.4.25-1+cuda12.2
+# RUN apt-cache madison tensorrt
+ENV NV_CODEC_HEADERS=11.0.10.1
+RUN \
+    DIR=/tmp/nv-codec-headers && \
+    mkdir -p ${DIR} && \
+    cd ${DIR} && \
+    curl -sL https://github.com/FFmpeg/nv-codec-headers/releases/download/n${NV_CODEC_HEADERS}/nv-codec-headers-${NV_CODEC_HEADERS}.tar.gz | \
+    tar -zx --strip-components=1 && \
+    make install
+# RUN apt remove libnvparsers-dev libnvinfer-dev=8.6.1.6-1+cuda12.0 -y
+# RUN apt-get install libnvparsers-dev libnvinfer-dev=8.6.1.6-1+cuda12.0 -y
+
+# RUN wget https://developer.nvidia.com/downloads/compute/machine-learning/tensorrt/10.0.1/local_repo/nv-tensorrt-local-repo-ubuntu2204-10.0.1-cuda-12.4_1.0-1_amd64.deb -O nv-tensorrt-local-repo-ubuntu2204-10.0.1-cuda-12.4_1.0-1_amd64.deb
+# RUN dpkg -i nv-tensorrt-local-repo-ubuntu2204-10.0.1-cuda-12.4_1.0-1_amd64.deb
+
+RUN wget --content-disposition 'https://api.ngc.nvidia.com/v2/resources/org/nvidia/deepstream/6.4/files?redirect=true&path=deepstream-6.4_6.4.0-1_amd64.deb' -O deepstream-6.4_6.4.0-1_amd64.deb
+RUN apt install  -y ./deepstream-6.4_6.4.0-1_amd64.deb --fix-broken

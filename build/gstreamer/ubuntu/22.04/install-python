@@ -27,11 +27,11 @@ apt install -y \
     wget \
     libbz2-dev
 # ln -s /usr/bin/python3.12 /usr/bin/python3
-update-alternatives --install /usr/bin/python python /usr/bin/python3.12 0
-echo "alias pip3='python -m pip'" >> ~/.bashrc
-echo "alias python3='python'" >> ~/.bashrc
+# update-alternatives --install /usr/bin/python python /usr/bin/python3.12 0
+# echo "alias pip3='python -m pip'" >> ~/.bashrc
+# echo "alias python3='python'" >> ~/.bashrc
 apt upgrade -y
-# pip3 install tomli
+pip3 install tomli
 # pip3 install tomlib
 apt remove -y meson
 pip3 install --upgrade meson
