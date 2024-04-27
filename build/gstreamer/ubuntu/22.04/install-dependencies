@@ -119,9 +119,9 @@ apt-get install -y --no-install-recommends \
   wget \
   xdg-dbus-proxy \
   python3-pip \
-  nvidia-driver-535
-apt-get clean
-rm -rf /var/lib/apt/lists/*
+  nvidia-driver-535 \
+  software-properties-common \
+  gpg-agent
 
 # install rust
 curl -o install-rustup.sh --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs
@@ -129,3 +129,6 @@ sh install-rustup.sh -y
 source "$HOME/.cargo/env"
 cargo install cargo-c
 rm -rf install-rustup.sh
+pip install --no-cache-dir --upgrade meson
+apt-get clean
+rm -rf /var/lib/apt/lists/*

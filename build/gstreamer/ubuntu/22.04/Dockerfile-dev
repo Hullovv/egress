@@ -8,6 +8,8 @@ ENV OPTIMIZATIONS=false
 COPY compile /
 COPY compile-rs /
 
+RUN pip3 install tomli
+
 RUN /compile
 RUN /compile-rs
 

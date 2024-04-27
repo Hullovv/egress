@@ -1,0 +1,41 @@
+#!/bin/bash
+set -euxo pipefail
+
+export DEBIAN_FRONTEND=noninteractive
+DIR=/tmp/cuda && \
+    mkdir -p ${DIR} && \
+    cd ${DIR} && \
+    curl -sL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin > cuda-ubuntu2204.pin && \
+    mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600 && \
+    apt-key del 7fa2af80 && \
+    apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub && \
+    add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /" && \
+    apt-get install --no-install-recommends -y libnvinfer-headers-dev=${PKG_VERSION} && \
+    apt-get install --no-install-recommends -y libnvinfer-dev=${PKG_VERSION} && \
+    apt-mark hold libnvinfer-headers-dev libnvinfer-dev && \
+    apt-get update && \
+    apt-get clean && \
+    apt-get install --no-install-recommends -y \
+    cuda-cudart-12-1 \
+    cuda-cudart-dev-12-1 \
+    libnpp-12-1 libnpp-dev-12-1 \
+    libgstreamer1.0-dev \
+    libnvonnxparsers8 \
+    libgstreamer-plugins-base1.0-0 \
+    libgstreamer-plugins-base1.0-0 \
+    libgstreamer-plugins-base1.0-dev \
+    libnvparsers8 \
+    libyaml-cpp-dev
+    # libnvinfer-dev=${PKG_VERSION} \
+apt-get install --no-install-recommends -y libnvonnxparsers-dev=${PKG_VERSION} libnvparsers-dev=${PKG_VERSION} libnvinfer-plugin8=${PKG_VERSION} libnvinfer-headers-plugin-dev=${PKG_VERSION} libnvinfer-plugin-dev=${PKG_VERSION}
+    
+
+DIR=/tmp/nv-codec-headers && \
+    mkdir -p ${DIR} && \
+    cd ${DIR} && \
+    curl -sL https://github.com/FFmpeg/nv-codec-headers/releases/download/n${NV_CODEC_HEADERS}/nv-codec-headers-${NV_CODEC_HEADERS}.tar.gz | \
+    tar -zx --strip-components=1 && \
+    make install
+
+apt-get clean
+rm -rf /var/lib/apt/lists/*
