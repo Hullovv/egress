@@ -1,0 +1,38 @@
+# #!/bin/bash
+# set -euxo pipefail
+
+# export DEBIAN_FRONTEND=noninteractive
+# # sed -i 's/# deb-src/deb-src/g' /etc/apt/sources.list
+# # apt-get update
+# # apt-get dist-upgrade -y
+# # apt install -y --no-install-recommends \
+# #     software-properties-common \
+# #     gpg-agent
+# # add-apt-repository ppa:deadsnakes/ppa
+# apt-get update -y
+
+# apt install -y python3-pip
+# #     python3.12-distutils \
+# #     python3.12-dev \
+# #     python3.12-full \
+# #     python3-setuptools \
+# #     build-essential \
+# #     zlib1g-dev \
+# #     libncurses5-dev \
+# #     libgdbm-dev \
+# #     libnss3-dev \
+# #     libssl-dev \
+# #     libreadline-dev \
+# #     libffi-dev \
+# #     libsqlite3-dev \
+# #     wget \
+# #     libbz2-dev
+# # ln -s /usr/bin/python3.12 /usr/bin/python3
+# # update-alternatives --install /usr/bin/python python /usr/bin/python3.12 0
+# # echo "alias pip='python3 -m pip'" >> ~/.bashrc
+# # echo "alias python3='python'" >> ~/.bashrc
+
+# # pip3 install tomli
+# # pip3 install tomlib
+# # apt remove -y meson
+

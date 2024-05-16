@@ -138,9 +138,9 @@ func matchPadsLocked(src, sink *Bin) (*gst.Pad, *gst.Pad, error) {
 func (b *Bin) getPadTemplatesLocked(direction gst.PadDirection) []*padTemplate {
 	var element *gst.Element
 	if direction == gst.PadDirectionSource {
-		element = b.elements[len(b.elements)-1]
+		element = b.Elements[len(b.Elements)-1]
 	} else {
-		element = b.elements[0]
+		element = b.Elements[0]
 	}
 
 	allTemplates := element.GetPadTemplates()
@@ -194,11 +194,11 @@ func (b *Bin) getPadTemplatesLocked(direction gst.PadDirection) []*padTemplate {
 func (b *Bin) getTypesLocked(direction gst.PadDirection) (map[string]struct{}, map[string]struct{}, bool) {
 	var i int
 	if direction == gst.PadDirectionSource {
-		i = len(b.elements) - 1
+		i = len(b.Elements) - 1
 	}
 
-	for i >= 0 && i < len(b.elements) {
-		allTemplates := b.elements[i].GetPadTemplates()
+	for i >= 0 && i < len(b.Elements) {
+		allTemplates := b.Elements[i].GetPadTemplates()
 		for _, template := range allTemplates {
 			if template.Direction() == gst.PadDirectionSource {
 				if caps := template.Caps(); !caps.IsAny() {

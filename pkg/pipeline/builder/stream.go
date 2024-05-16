@@ -46,14 +46,14 @@ type StreamSink struct {
 }
 
 func BuildStreamBin(pipeline *gstreamer.Pipeline, p *config.PipelineConfig) (*StreamBin, *gstreamer.Bin, error) {
-	b := pipeline.NewBin("stream")
+	b := pipeline.NewBin("stream") 
 	o := p.GetStreamConfig()
 
 	var mux *gst.Element
 	var err error
 	switch o.OutputType {
 	case types.OutputTypeRTMP:
-		mux, err = gst.NewElement("flvmux")
+		mux, err = gst.NewElementWithName("flvmux", "flvmux")
 		if err != nil {
 			return nil, nil, errors.ErrGstPipelineError(err)
 		}
@@ -74,8 +74,8 @@ func BuildStreamBin(pipeline *gstreamer.Pipeline, p *config.PipelineConfig) (*St
 	if err != nil {
 		return nil, nil, err
 	}
-
-	tee, err := gst.NewElement("tee")
+	
+	tee, err := gst.NewElementWithName("tee", "tee")
 	if err != nil {
 		return nil, nil, errors.ErrGstPipelineError(err)
 	}

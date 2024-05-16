@@ -5,9 +5,10 @@ export DEBIAN_FRONTEND=noninteractive
 
 sed -i 's/# deb-src/deb-src/g' /etc/apt/sources.list
 apt-get update
-apt-get dist-upgrade -y
-apt-get install -y --no-install-recommends \
+# apt-get dist-upgrade -y
+apt-get install -y --no-install-recommends --allow-change-held-packages --reinstall \
   bison \
+  dirmngr \
   bubblewrap \
   ca-certificates \
   cmake \
@@ -42,6 +43,7 @@ apt-get install -y --no-install-recommends \
   libdw-dev \
   libepoxy-dev \
   libfaac-dev \
+  libfaac0 \
   libfaad-dev \
   libfdk-aac-dev \
   libgbm-dev \
@@ -116,13 +118,18 @@ apt-get install -y --no-install-recommends \
   python3 \
   ruby \
   wget \
-  xdg-dbus-proxy
-apt-get clean
-rm -rf /var/lib/apt/lists/*
+  xdg-dbus-proxy \
+  python3-pip \
+  nvidia-driver-535 \
+  software-properties-common \
+  gpg-agent
 
 # install rust
-curl -o install-rustup.sh --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs 
+curl -o install-rustup.sh --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs
 sh install-rustup.sh -y
 source "$HOME/.cargo/env"
 cargo install cargo-c
 rm -rf install-rustup.sh
+pip install --no-cache-dir --upgrade meson
+apt-get clean
+rm -rf /var/lib/apt/lists/*

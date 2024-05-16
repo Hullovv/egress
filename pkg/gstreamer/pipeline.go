@@ -66,6 +66,7 @@ func (p *Pipeline) AddSourceBin(src *Bin) error {
 }
 
 func (p *Pipeline) AddSinkBin(sink *Bin) error {
+	logger.Infow("AddSinkBinPipeline:", sink)
 	if p.elementsAdded {
 		return errors.ErrWrongHierarchy
 	}
