@@ -4,7 +4,7 @@ ARG GSTREAMER_VERSION=1.22.8 \
     LIBNICE_VERSION=0.1.22 \
     PKG_VERSION=8.6.1.6-1+cuda12.0
 
-COPY install-dependencies install-python install-cuda /
+COPY install-dependencies install-python /
 
 RUN /install-dependencies 
 # && \ /install-python
@@ -31,11 +31,11 @@ RUN wget https://libnice.freedesktop.org/releases/libnice-$LIBNICE_VERSION.tar.g
     tar xfz libnice-$LIBNICE_VERSION.tar.gz && \
     rm libnice-$LIBNICE_VERSION.tar.gz && \
     mv libnice-$LIBNICE_VERSION libnice
-
+COPY install-cuda /
 RUN /install-cuda
 
-RUN wget --content-disposition 'https://api.ngc.nvidia.com/v2/resources/org/nvidia/deepstream/6.3/files?redirect=true&path=deepstream-6.3_6.3.0-1_amd64.deb' -O deepstream-6.3_6.3.0-1_amd64.deb && \
-    dpkg -i ./deepstream-6.3_6.3.0-1_amd64.deb && \
-    rm ./deepstream-6.3_6.3.0-1_amd64.deb && \
+RUN wget --content-disposition 'https://api.ngc.nvidia.com/v2/resources/org/nvidia/deepstream/6.4/files?redirect=true&path=deepstream-6.4_6.4.0-1_amd64.deb' -O deepstream-6.4_6.4.0-1_amd64.deb && \
+    dpkg -i ./deepstream-6.4_6.4.0-1_amd64.deb && \
+    rm ./deepstream-6.4_6.4.0-1_amd64.deb && \
     apt-get clean &&\
     rm -rf /var/lib/apt/lists/*

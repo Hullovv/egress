@@ -206,12 +206,12 @@ func (b *VideoBin) buildWebInput() error {
 		return err
 	}
 
-	videoConvert, err := gst.NewElement("videoconvert")
+	caps, err := gst.NewElement("capsfilter")
 	if err != nil {
 		return errors.ErrGstPipelineError(err)
 	}
 
-	caps, err := gst.NewElement("capsfilter")
+	videoConvert, err := gst.NewElement("videoconvert")
 	if err != nil {
 		return errors.ErrGstPipelineError(err)
 	}
@@ -222,7 +222,6 @@ func (b *VideoBin) buildWebInput() error {
 	)); err != nil {
 		return errors.ErrGstPipelineError(err)
 	}
-
 	if err = b.bin.AddElements(xImageSrc, videoQueue, videoConvert, caps); err != nil {
 		return err
 	}
@@ -466,7 +465,7 @@ func (b *VideoBin) addVideoTestSrcBin() error {
 	}
 	videoTestSrc.SetArg("pattern", "black")
 
-	caps, err := newVideoCapsFilter(b.conf, true)
+	caps, err := newVideoCapsFilter(b.conf, true, false)
 	if err != nil {
 		return errors.ErrGstPipelineError(err)
 	}
@@ -496,7 +495,7 @@ func (b *VideoBin) addSelector() error {
 		return err
 	}
 
-	caps, err := newVideoCapsFilter(b.conf, true)
+	caps, err := newVideoCapsFilter(b.conf, true, false)
 	if err != nil {
 		return errors.ErrGstPipelineError(err)
 	}
@@ -628,14 +627,29 @@ func (b *VideoBin) addDecodedVideoSink() error {
 }
 
 func addVideoConverter(b *gstreamer.Bin, p *config.PipelineConfig) error {
+	logger.Infow("START addVideoConverter")
 	videoQueue, err := gstreamer.BuildQueue("video_input_queue", config.Latency, true)
 	if err != nil {
 		return err
 	}
-
-	videoConvert, err := gst.NewElement("videoconvert")
-	if err != nil {
-		return errors.ErrGstPipelineError(err)
+	var videoConvert, nvv_parser *gst.Element
+	gpu := true
+	if gpu == true {
+		videoConvert, err = gst.NewElementWithName("nvvideoconvert", "nvvideoconvert")
+		if err != nil {
+			return errors.ErrGstPipelineError(err)
+		}
+		nvv_parser, err = gst.NewElementWithName("nvv4l2h264enc", "nvv4l2h264")
+		if err != nil {
+			return errors.ErrGstPipelineError(err)
+		}
+		logger.Infow("START addVideoConverter:: CONVERTER WITH GPU")
+	} else {
+		logger.Infow("START addVideoConverter:: CONVERTER")
+		videoConvert, err = gst.NewElement("videoconvert")
+		if err != nil {
+			return errors.ErrGstPipelineError(err)
+		}
 	}
 
 	videoScale, err := gst.NewElement("videoscale")
@@ -654,28 +668,52 @@ func addVideoConverter(b *gstreamer.Bin, p *config.PipelineConfig) error {
 		return err
 	}
 
-	caps, err := newVideoCapsFilter(p, true)
-	if err != nil {
-		return errors.ErrGstPipelineError(err)
-	}
+	// caps, err := newVideoCapsFilter(p, true, true)
+	// if err != nil {
+	// 	return errors.ErrGstPipelineError(err)
+	// }
+	var caps *gst.Element
 
-	return b.AddElements(videoQueue, videoConvert, videoScale, videoRate, caps)
+	if gpu == true {
+		logger.Infow("START Caps With GPU")
+		caps, err = newVideoCapsFilter(p, true, true)
+		if err != nil {
+			return errors.ErrGstPipelineError(err)
+		}
+		return b.AddElements(videoQueue, videoConvert, videoScale, videoRate, caps, nvv_parser)
+	} else {
+		logger.Infow("START Caps")
+		caps, err = newVideoCapsFilter(p, true, false)
+		if err != nil {
+			return errors.ErrGstPipelineError(err)
+		}
+		return b.AddElements(videoQueue, videoConvert, videoScale, videoRate, caps)
+	}
 }
 
-func newVideoCapsFilter(p *config.PipelineConfig, includeFramerate bool) (*gst.Element, error) {
+func newVideoCapsFilter(p *config.PipelineConfig, includeFramerate bool, gpu bool) (*gst.Element, error) {
 	caps, err := gst.NewElement("capsfilter")
+	var video_raw, video_format string
+	if gpu == true {
+		video_raw = "video/x-raw(memory:NVMM)"
+		video_format = "(string)NV12"
+	} else {
+		video_raw = "video/x-raw"
+		video_format = "I420"
+	}
+	logger.Infow("START Caps ::", video_raw, video_format)
 	if err != nil {
 		return nil, errors.ErrGstPipelineError(err)
 	}
 	if includeFramerate {
 		err = caps.SetProperty("caps", gst.NewCapsFromString(fmt.Sprintf(
-			"video/x-raw,framerate=%d/1,format=I420,width=%d,height=%d,colorimetry=bt709,chroma-site=mpeg2,pixel-aspect-ratio=1/1",
-			p.Framerate, p.Width, p.Height,
+			"%s,framerate=%d/1,format=%s,width=%d,height=%d,colorimetry=bt709,chroma-site=mpeg2,pixel-aspect-ratio=1/1",
+			video_raw, video_format, p.Framerate, p.Width, p.Height,
 		)))
 	} else {
 		err = caps.SetProperty("caps", gst.NewCapsFromString(fmt.Sprintf(
-			"video/x-raw,format=I420,width=%d,height=%d,colorimetry=bt709,chroma-site=mpeg2,pixel-aspect-ratio=1/1",
-			p.Width, p.Height,
+			"%s,format=%s,width=%d,height=%d,colorimetry=bt709,chroma-site=mpeg2,pixel-aspect-ratio=1/1",
+			video_raw, video_format, p.Width, p.Height,
 		)))
 	}
 	if err != nil {

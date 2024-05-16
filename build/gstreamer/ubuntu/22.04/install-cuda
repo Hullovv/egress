@@ -15,19 +15,27 @@ DIR=/tmp/cuda && \
     apt-mark hold libnvinfer-headers-dev libnvinfer-dev && \
     apt-get update && \
     apt-get clean && \
-    apt-get install --no-install-recommends -y \
-    cuda-cudart-12-1 \
-    cuda-cudart-dev-12-1 \
-    libnpp-12-1 libnpp-dev-12-1 \
+    apt-get install --no-install-recommends --reinstall -y \
+    cuda-cudart-12-2 \
+    cuda-cudart-dev-12-2 \
+    libnpp-12-2 \
+    libnpp-dev-12-2 \
+    libgstreamer1.0-0 \
     libgstreamer1.0-dev \
-    libnvonnxparsers8 \
-    libgstreamer-plugins-base1.0-0 \
     libgstreamer-plugins-base1.0-0 \
     libgstreamer-plugins-base1.0-dev \
-    libnvparsers8 \
-    libyaml-cpp-dev
-    # libnvinfer-dev=${PKG_VERSION} \
-apt-get install --no-install-recommends -y libnvonnxparsers-dev=${PKG_VERSION} libnvparsers-dev=${PKG_VERSION} libnvinfer-plugin8=${PKG_VERSION} libnvinfer-headers-plugin-dev=${PKG_VERSION} libnvinfer-plugin-dev=${PKG_VERSION}
+    libnvinfer-headers-dev=8.6.1.6-1+cuda12.0 \
+    libnvinfer8=8.6.1.6-1+cuda12.0 \
+    libnvinfer-dev=8.6.1.6-1+cuda12.0 \
+    libnvparsers8=8.6.1.6-1+cuda12.0 \
+    libnvparsers-dev=8.6.1.6-1+cuda12.0 \
+    libnvonnxparsers8=8.6.1.6-1+cuda12.0 \
+    libnvonnxparsers-dev=8.6.1.6-1+cuda12.0 \
+    libnvinfer-plugin8=8.6.1.6-1+cuda12.0 \
+    libnvinfer-plugin-dev=8.6.1.6-1+cuda12.0 \
+    libnvinfer-headers-plugin-dev=8.6.1.6-1+cuda12.0 \
+    libyaml-cpp-dev \
+    libgles2-mesa-dev
     
 
 DIR=/tmp/nv-codec-headers && \

@@ -113,12 +113,33 @@ func New(ctx context.Context, conf *config.PipelineConfig, ioClient rpc.IOInfoCl
 	return c, nil
 }
 
+func printElementInfo(element *gst.Element) {
+    // Получаем шаблоны пэдов (портов) элемента
+    templates := element.GetPadTemplates()
+    for _, t := range templates {
+        logger.Infow("Pad template: %s, Direction: %v\n", t.Name(), t.Direction())
+    }
+
+    // Получаем активные пэды элемента
+    pads, err := element.GetPads()
+	if err != nil {
+		logger.Infow("PadError: %s,", err)
+	}
+    for _, p := range pads {
+        // peer := p.Peer()
+        // if peer != nil {
+        //     fmt.Printf("Pad: %s, Peer: %s\n", p) //peer
+        // } else {
+        logger.Infow("Pad: %s, Peer: <none>\n", p)
+        // }
+    }
+}
+
 func (c *Controller) BuildPipeline() error {
 	p, err := gstreamer.NewPipeline(pipelineName, config.Latency, c.callbacks)
 	if err != nil {
 		return errors.ErrGstPipelineError(err)
 	}
-
 	p.SetWatch(c.messageWatch)
 	p.AddOnStop(func() error {
 		c.stopped.Break()
@@ -141,7 +162,7 @@ func (c *Controller) BuildPipeline() error {
 			return err
 		}
 	}
-
+	logger.Infow("Pipeline:: ", p)
 	var sinkBins []*gstreamer.Bin
 	for egressType := range c.Outputs {
 		switch egressType {
@@ -158,6 +179,7 @@ func (c *Controller) BuildPipeline() error {
 		case types.EgressTypeStream:
 			var sinkBin *gstreamer.Bin
 			c.streamBin, sinkBin, err = builder.BuildStreamBin(p, c.PipelineConfig)
+			logger.Infow("Pipeline:: ", p)
 			sinkBins = append(sinkBins, sinkBin)
 
 		case types.EgressTypeWebsocket:
@@ -175,18 +197,24 @@ func (c *Controller) BuildPipeline() error {
 			return err
 		}
 	}
-
+	logger.Infow("streamConfig:: ", c.PipelineConfig)
 	for _, bin := range sinkBins {
 		if err = p.AddSinkBin(bin); err != nil {
 			return err
 		}
 	}
 
+	for _, el := range p.Elements {
+		printElementInfo(el)
+	}
+
 	if err = p.Link(); err != nil {
+		logger.Infow("Error start:: ", err)
 		return err
 	}
 
 	c.p = p
+	logger.Infow("Pipeline:: ", p)
 	close(c.callbacks.BuildReady)
 	return nil
 }
@@ -194,6 +222,7 @@ func (c *Controller) BuildPipeline() error {
 func (c *Controller) Run(ctx context.Context) *livekit.EgressInfo {
 	ctx, span := tracer.Start(ctx, "Pipeline.Run")
 	defer span.End()
+	logger.Infow("PipelineContext:: ", ctx)
 
 	c.Info.StartedAt = time.Now().UnixNano()
 	defer c.Close()
@@ -210,7 +239,7 @@ func (c *Controller) Run(ctx context.Context) *livekit.EgressInfo {
 	// wait until room is ready
 	start := c.src.StartRecording()
 	if start != nil {
-		logger.Debugw("waiting for start signal")
+		logger.Infow("waiting for start signal")
 		select {
 		case <-c.stopped.Watch():
 			c.Info.Status = livekit.EgressStatus_EGRESS_ABORTED
@@ -239,7 +268,7 @@ func (c *Controller) Run(ctx context.Context) *livekit.EgressInfo {
 		return c.Info
 	}
 
-	logger.Debugw("closing sinks")
+	logger.Infow("closing sinks")
 	for _, si := range c.sinks {
 		for _, s := range si {
 			if err := s.Close(); err != nil && c.playing.IsBroken() {
@@ -388,7 +417,7 @@ func (c *Controller) SendEOS(ctx context.Context) {
 	defer span.End()
 
 	c.eos.Once(func() {
-		logger.Debugw("sending EOS")
+		logger.Infow("sending EOS")
 
 		if c.limitTimer != nil {
 			c.limitTimer.Stop()
@@ -446,7 +475,7 @@ func (c *Controller) Close() {
 		c.updateDuration(c.src.GetEndedAt())
 	}
 
-	logger.Debugw("closing source")
+	logger.Infow("closing source")
 	c.src.Close()
 
 	now := time.Now().UnixNano()
