@@ -25,7 +25,10 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; then GOARCH=arm64; else GOARCH=amd
     tar -C /usr/local -xzf go1.22.1.linux-${GOARCH}.tar.gz
 ENV PATH="/usr/local/go/bin:${PATH}"
 
-
+RUN set -eux; \
+  cd /app; \
+  go install github.com/cosmtrek/air@latest; \
+  go install github.com/go-delve/delve/cmd/dlv@latest; \
 # download go modules
 COPY go.mod .
 COPY go.sum .
