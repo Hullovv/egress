@@ -22,7 +22,7 @@ import (
 
 	"github.com/Azure/azure-storage-blob-go/azblob"
 
-	"github.com/livekit/egress/pkg/types"
+	"github.com/Hullovv/egress/pkg/types"
 	"github.com/livekit/protocol/livekit"
 )
 

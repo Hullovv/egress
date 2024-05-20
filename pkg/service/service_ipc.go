@@ -19,8 +19,8 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/livekit/egress/pkg/errors"
-	"github.com/livekit/egress/pkg/ipc"
+	"github.com/Hullovv/egress/pkg/errors"
+	"github.com/Hullovv/egress/pkg/ipc"
 )
 
 func (s *Service) HandlerReady(_ context.Context, req *ipc.HandlerReadyRequest) (*emptypb.Empty, error) {

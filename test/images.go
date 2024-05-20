@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/livekit/egress/pkg/config"
+	"github.com/Hullovv/egress/pkg/config"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/rpc"
 )

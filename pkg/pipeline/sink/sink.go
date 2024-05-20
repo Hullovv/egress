@@ -15,11 +15,11 @@
 package sink
 
 import (
-	"github.com/livekit/egress/pkg/config"
-	"github.com/livekit/egress/pkg/gstreamer"
-	"github.com/livekit/egress/pkg/pipeline/sink/uploader"
-	"github.com/livekit/egress/pkg/stats"
-	"github.com/livekit/egress/pkg/types"
+	"github.com/Hullovv/egress/pkg/config"
+	"github.com/Hullovv/egress/pkg/gstreamer"
+	"github.com/Hullovv/egress/pkg/pipeline/sink/uploader"
+	"github.com/Hullovv/egress/pkg/stats"
+	"github.com/Hullovv/egress/pkg/types"
 )
 
 type Sink interface {

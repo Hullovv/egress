@@ -20,7 +20,7 @@ import (
 
 	"github.com/go-gst/go-gst/gst"
 
-	"github.com/livekit/egress/pkg/errors"
+	"github.com/Hullovv/egress/pkg/errors"
 	"github.com/livekit/protocol/logger"
 )
 

@@ -1,4 +1,4 @@
-module github.com/livekit/egress
+module github.com/Hullovv/egress
 
 go 1.22
 

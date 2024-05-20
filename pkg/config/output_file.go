@@ -21,7 +21,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/livekit/egress/pkg/types"
+	"github.com/Hullovv/egress/pkg/types"
 	"github.com/livekit/protocol/livekit"
 )
 

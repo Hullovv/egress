@@ -23,14 +23,14 @@ import (
 	"github.com/go-gst/go-gst/gst"
 	"go.uber.org/zap"
 
-	"github.com/livekit/egress/pkg/config"
-	"github.com/livekit/egress/pkg/errors"
-	"github.com/livekit/egress/pkg/gstreamer"
+	"github.com/Hullovv/egress/pkg/config"
+	"github.com/Hullovv/egress/pkg/errors"
+	"github.com/Hullovv/egress/pkg/gstreamer"
 	"github.com/Hullovv/egress/pkg/pipeline/builder"
-	"github.com/livekit/egress/pkg/pipeline/sink"
-	"github.com/livekit/egress/pkg/pipeline/source"
-	"github.com/livekit/egress/pkg/stats"
-	"github.com/livekit/egress/pkg/types"
+	"github.com/Hullovv/egress/pkg/pipeline/sink"
+	"github.com/Hullovv/egress/pkg/pipeline/source"
+	"github.com/Hullovv/egress/pkg/stats"
+	"github.com/Hullovv/egress/pkg/types"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
@@ -152,17 +152,18 @@ func (c *Controller) BuildPipeline() error {
 		})
 	}
 
+	logger.Infow("AudioEnabled:: ", c.AudioEnabled)
 	if c.AudioEnabled {
 		if err = builder.BuildAudioBin(p, c.PipelineConfig); err != nil {
 			return err
 		}
 	}
+	logger.Infow("VideoEnabled:: ", c.VideoEnabled)
 	if c.VideoEnabled {
 		if err = builder.BuildVideoBin(p, c.PipelineConfig); err != nil {
 			return err
 		}
 	}
-	logger.Infow("Pipeline:: ", p)
 	var sinkBins []*gstreamer.Bin
 	for egressType := range c.Outputs {
 		switch egressType {
@@ -177,12 +178,13 @@ func (c *Controller) BuildPipeline() error {
 			sinkBins = append(sinkBins, sinkBin)
 
 		case types.EgressTypeStream:
+			logger.Infow("Start Stream Egress")
 			var sinkBin *gstreamer.Bin
 			c.streamBin, sinkBin, err = builder.BuildStreamBin(p, c.PipelineConfig)
-			logger.Infow("Pipeline:: ", p)
 			sinkBins = append(sinkBins, sinkBin)
 
 		case types.EgressTypeWebsocket:
+			logger.Infow("Start Websocket Egress")
 			var sinkBin *gstreamer.Bin
 			writer := c.sinks[egressType][0].(*sink.WebsocketSink)
 			sinkBin, err = builder.BuildWebsocketBin(p, writer.SinkCallbacks())

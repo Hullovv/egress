@@ -25,9 +25,9 @@ import (
 
 	"github.com/go-gst/go-gst/gst"
 
-	"github.com/livekit/egress/pkg/errors"
-	"github.com/livekit/egress/pkg/pipeline/sink/uploader"
-	"github.com/livekit/egress/pkg/types"
+	"github.com/Hullovv/egress/pkg/errors"
+	"github.com/Hullovv/egress/pkg/pipeline/sink/uploader"
+	"github.com/Hullovv/egress/pkg/types"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/pprof"
 )

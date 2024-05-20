@@ -30,7 +30,7 @@ ENV PATH="/usr/local/go/bin:${PATH}"
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
-
+# RUN go get github.com/Hullovv/egress/pkg/pipeline/builder
 # copy source
 COPY cmd/ cmd/
 COPY pkg/ pkg/

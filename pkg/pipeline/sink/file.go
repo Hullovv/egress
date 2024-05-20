@@ -19,8 +19,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/livekit/egress/pkg/config"
-	"github.com/livekit/egress/pkg/pipeline/sink/uploader"
+	"github.com/Hullovv/egress/pkg/config"
+	"github.com/Hullovv/egress/pkg/pipeline/sink/uploader"
 	"github.com/livekit/protocol/logger"
 )
 

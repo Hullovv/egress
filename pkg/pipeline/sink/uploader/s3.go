@@ -29,8 +29,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 
-	"github.com/livekit/egress/pkg/config"
-	"github.com/livekit/egress/pkg/types"
+	"github.com/Hullovv/egress/pkg/config"
+	"github.com/Hullovv/egress/pkg/types"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/psrpc"
 )
