@@ -18,6 +18,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/jaypipes/ghw"
+	"github.com/jaypipes/ghw/pkg/gpu"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/redis"
 	lksdk "github.com/livekit/server-sdk-go/v2"
@@ -40,6 +42,7 @@ type BaseConfig struct {
 	EnableChromeSandbox bool                    `yaml:"enable_chrome_sandbox"` // enable Chrome sandbox, requires extra docker configuration
 	StorageConfig       `yaml:",inline"`        // upload config (S3, Azure, GCP, or AliOSS)
 	SessionLimits       `yaml:"session_limits"` // session duration limits
+	UseGpu              *Gpu                    `yaml:"enable_use_gpu"`
 
 	// dev/debugging
 	Insecure bool        `yaml:"insecure"` // allow chrome to connect to an insecure websocket
@@ -104,6 +107,11 @@ type SessionLimits struct {
 	ImageOutputMaxDuration   time.Duration `yaml:"image_output_max_duration"`
 }
 
+type Gpu struct {
+	Enabled bool `yaml:"enabled"`
+	GpuId   int  `yaml:"gpu_id"`
+}
+
 func (c *BaseConfig) initLogger(values ...interface{}) error {
 	if c.LogLevel != "" {
 		logger.Warnw("log_level deprecated. use logging instead", nil)
@@ -133,4 +141,30 @@ func (c *BaseConfig) initLogger(values ...interface{}) error {
 	logger.SetLogger(l, "egress")
 	lksdk.SetLogger(l)
 	return nil
+}
+
+func (c *BaseConfig) СheckGpu() bool {
+	logger.Infow("Start check gpu")
+	var (
+		check bool
+		err   error
+		gpu_c *gpu.Info
+	)
+	if c.UseGpu.Enabled {
+		logger.Infow("Start check gpu TRUE")
+		gpu_c, err = ghw.GPU()
+		logger.Infow("Start check gpu GPU::", gpu_c)
+		if err != nil {
+			logger.Infow("Start check gpu ERROR:: ", err)
+			return false
+		}
+		if len(gpu_c.GraphicsCards) != 0 {
+			return true
+		} else {
+			// c.UseGpu.Enabled = false
+			return check
+		}
+	} else {
+		return check
+	}
 }
