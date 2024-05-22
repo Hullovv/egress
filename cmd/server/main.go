@@ -21,7 +21,9 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
+	"time"
 
 	"github.com/urfave/cli/v2"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -40,6 +42,9 @@ import (
 var (
 	//go:embed templates
 	templateEmbedFs embed.FS
+
+	Threads = map[string]interface{}{}
+	Mu      = &sync.Mutex{}
 )
 
 func main() {
@@ -144,6 +149,15 @@ func runService(c *cli.Context) error {
 		case sig := <-killChan:
 			logger.Infow("exit requested, stopping recording and shutting down", "signal", sig)
 			svc.Stop(true)
+		}
+	}()
+
+	go func() {
+		for {
+			<-time.After((5 * time.Second))
+			Mu.Lock()
+			logger.Infow("THREADS: %v", Threads)
+			Mu.Unlock()
 		}
 	}()
 
