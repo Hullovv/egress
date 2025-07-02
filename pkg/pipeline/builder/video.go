@@ -666,36 +666,29 @@ func (b *VideoBin) addDecodedVideoSink() error {
 }
 
 func (b *VideoBin) addVideoConverter(bin *gstreamer.Bin) error {
+	var elements []*gst.Element
+	var caps *gst.Element
+
 	videoQueue, err := gstreamer.BuildQueue("video_input_queue", b.conf.Latency.PipelineLatency, true)
 	if err != nil {
 		return errors.ErrGstPipelineError(err)
 	}
-	var videoConvert, nvv_parser *gst.Element
-	gpu := true
-	if gpu == true {
-		videoConvert, err = gst.NewElementWithName("nvvideoconvert", "nvvideoconvert")
-		if err != nil {
-			return errors.ErrGstPipelineError(err)
-		}
-		nvv_parser, err = gst.NewElementWithName("nvv4l2h264enc", "nvv4l2h264")
-		if err != nil {
-			return errors.ErrGstPipelineError(err)
-		}
-		logger.Infow("START addVideoConverter:: CONVERTER WITH GPU")
-	} else {
-		logger.Infow("START addVideoConverter:: CONVERTER")
-		videoConvert, err = gst.NewElement("videoconvert")
-		if err != nil {
-			return errors.ErrGstPipelineError(err)
-		}
+
+	elements = append(elements, videoQueue)
+
+	videoConverterElements, err := b.newVideoConverter()
+	if err != nil {
+		return errors.ErrGstPipelineError(err)
 	}
+
+	elements = append(elements, videoConverterElements...)
 
 	videoScale, err := gst.NewElement("videoscale")
 	if err != nil {
 		return errors.ErrGstPipelineError(err)
 	}
 
-	elements := []*gst.Element{videoQueue, videoConvert, videoScale}
+	elements = append(elements, videoScale)
 
 	if !b.conf.VideoDecoding {
 		videoRate, err := gst.NewElement("videorate")
@@ -708,25 +701,7 @@ func (b *VideoBin) addVideoConverter(bin *gstreamer.Bin) error {
 		elements = append(elements, videoRate)
 	}
 
-	var caps *gst.Element
-
-	if gpu == true {
-		logger.Infow("START Caps With GPU")
-		caps, err = newVideoCapsFilter(p, true, true)
-		if err != nil {
-			return errors.ErrGstPipelineError(err)
-		}
-		return b.AddElements(videoQueue, videoConvert, videoScale, videoRate, caps, nvv_parser)
-	} else {
-		logger.Infow("START Caps")
-		caps, err = newVideoCapsFilter(p, true, false)
-		if err != nil {
-			return errors.ErrGstPipelineError(err)
-		}
-		return b.AddElements(videoQueue, videoConvert, videoScale, videoRate, caps)
-	}
-
-	caps, err := b.newVideoCapsFilter(!b.conf.VideoDecoding)
+	caps, err = b.newVideoCapsFilter(!b.conf.VideoDecoding)
 	if err != nil {
 		return errors.ErrGstPipelineError(err)
 	}
@@ -735,66 +710,61 @@ func (b *VideoBin) addVideoConverter(bin *gstreamer.Bin) error {
 	return bin.AddElements(elements...)
 }
 
-func (b *VideoBin) newVideoCapsFilter(includeFramerate bool) (*gst.Element, error) {
-	// caps, err := newVideoCapsFilter(p, true, true)
-	// if err != nil {
-	// 	return errors.ErrGstPipelineError(err)
-	// }
-	var caps *gst.Element
+func (b *VideoBin) newVideoConverter() ([]*gst.Element, error) {
+	var elements []*gst.Element
+	var videoConvert, nvv_parser *gst.Element
+	var err error
 
-	if gpu == true {
-		logger.Infow("START Caps With GPU")
-		caps, err = newVideoCapsFilter(p, true, true)
+	if b.conf.UseGpu.Enabled {
+		videoConvert, err = gst.NewElementWithName("nvvideoconvert", "nvvideoconvert")
 		if err != nil {
-			return errors.ErrGstPipelineError(err)
+			return nil, errors.ErrGstPipelineError(err)
 		}
-		return b.AddElements(videoQueue, videoConvert, videoScale, videoRate, caps, nvv_parser)
+		nvv_parser, err = gst.NewElementWithName("nvv4l2h264enc", "nvv4l2h264")
+		if err != nil {
+			return nil, errors.ErrGstPipelineError(err)
+		}
+		elements = append(elements, videoConvert, nvv_parser)
 	} else {
-		logger.Infow("START Caps")
-		caps, err = newVideoCapsFilter(p, true, false)
+		videoConvert, err = gst.NewElement("videoconvert")
 		if err != nil {
-			return errors.ErrGstPipelineError(err)
+			return nil, errors.ErrGstPipelineError(err)
 		}
-		return b.AddElements(videoQueue, videoConvert, videoScale, videoRate, caps)
+		elements = append(elements, videoConvert)
 	}
+
+	return elements, nil
 }
 
-func newVideoCapsFilter(p *config.PipelineConfig, includeFramerate bool, gpu bool) (*gst.Element, error) {
+func (b *VideoBin) newVideoCapsFilter(includeFramerate bool) (*gst.Element, error) {
 	caps, err := gst.NewElement("capsfilter")
-	var video_raw, video_format string
-	if gpu == true {
-		video_raw = "video/x-raw(memory:NVMM)"
-		video_format = "(string)NV12"
-	} else {
-		video_raw = "video/x-raw"
-		video_format = "I420"
-	}
-	logger.Infow("START Caps ::", video_raw, video_format)
 	if err != nil {
 		return nil, errors.ErrGstPipelineError(err)
 	}
+	video_raw, video_format := b.newVideoRawAndFormat()
 	if includeFramerate {
 		err = caps.SetProperty("caps", gst.NewCapsFromString(fmt.Sprintf(
-			"video/x-raw,framerate=%d/1,format=I420,width=%d,height=%d,colorimetry=bt709,chroma-site=mpeg2,pixel-aspect-ratio=1/1",
-			b.conf.Framerate, b.conf.Width, b.conf.Height,
-		)))
-	} else {
-		err = caps.SetProperty("caps", gst.NewCapsFromString(fmt.Sprintf(
-			"video/x-raw,format=I420,width=%d,height=%d,colorimetry=bt709,chroma-site=mpeg2,pixel-aspect-ratio=1/1",
-			b.conf.Width, b.conf.Height,
 			"%s,framerate=%d/1,format=%s,width=%d,height=%d,colorimetry=bt709,chroma-site=mpeg2,pixel-aspect-ratio=1/1",
-			video_raw, video_format, p.Framerate, p.Width, p.Height,
+			video_raw, video_format, b.conf.Framerate, b.conf.Width, b.conf.Height,
 		)))
 	} else {
 		err = caps.SetProperty("caps", gst.NewCapsFromString(fmt.Sprintf(
 			"%s,format=%s,width=%d,height=%d,colorimetry=bt709,chroma-site=mpeg2,pixel-aspect-ratio=1/1",
-			video_raw, video_format, p.Width, p.Height,
+			video_raw, video_format, b.conf.Width, b.conf.Height,
 		)))
 	}
 	if err != nil {
 		return nil, errors.ErrGstPipelineError(err)
 	}
 	return caps, nil
+}
+
+func (b *VideoBin) newVideoRawAndFormat() (string, string) {
+	if b.conf.UseGpu.Enabled {
+		return "video/x-raw(memory:NVMM)", "(string)NV12"
+	} else {
+		return "video/x-raw", "I420"
+	}
 }
 
 func (b *VideoBin) getSrcPad(name string) *gst.Pad {
@@ -812,7 +782,7 @@ func (b *VideoBin) createSrcPad(trackID, name string) {
 
 	pad := b.selector.GetRequestPad("sink_%u")
 	pad.AddProbe(gst.PadProbeTypeBuffer, func(pad *gst.Pad, info *gst.PadProbeInfo) gst.PadProbeReturn {
-		pts := uint64(info.GetBuffer().PresentationTimestamp())
+		pts := uint64(*info.GetBuffer().PresentationTimestamp().AsDuration())
 		b.mu.Lock()
 		if pts < b.lastPTS || (b.selectedPad != videoTestSrcName && b.selectedPad != name) {
 			b.mu.Unlock()
@@ -832,7 +802,7 @@ func (b *VideoBin) createTestSrcPad() {
 
 	pad := b.selector.GetRequestPad("sink_%u")
 	pad.AddProbe(gst.PadProbeTypeBuffer, func(pad *gst.Pad, info *gst.PadProbeInfo) gst.PadProbeReturn {
-		pts := uint64(info.GetBuffer().PresentationTimestamp())
+		pts := uint64(*info.GetBuffer().PresentationTimestamp().AsDuration())
 		b.mu.Lock()
 		if pts < b.lastPTS || (b.selectedPad != videoTestSrcName) {
 			b.mu.Unlock()
