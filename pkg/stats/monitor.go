@@ -27,7 +27,7 @@ import (
 	"github.com/Hullovv/egress/pkg/config"
 	"github.com/Hullovv/egress/pkg/errors"
 	"github.com/Hullovv/egress/pkg/types"
-	"github.com/livekit/egress/pkg/pipeline/source/pulse"
+	"github.com/Hullovv/egress/pkg/pipeline/source/pulse"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils/hwstats"

@@ -113,7 +113,7 @@ RUN apt-get update && \
     libzbar0 \
     libzvbi0 \
     mjpegtools \
-    nvidia-driver-535 \
+    # nvidia-driver-535 \
     xdg-dbus-proxy && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*

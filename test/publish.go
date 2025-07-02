@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/livekit/egress/pkg/types"
+	"github.com/Hullovv/egress/pkg/types"
 	lksdk "github.com/livekit/server-sdk-go/v2"
 )
 

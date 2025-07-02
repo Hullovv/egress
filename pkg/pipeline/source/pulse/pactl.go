@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"os/exec"
 
-	"github.com/livekit/egress/pkg/errors"
+	"github.com/Hullovv/egress/pkg/errors"
 )
 
 func Clients() (int, error) {

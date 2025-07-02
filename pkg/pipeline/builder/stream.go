@@ -25,8 +25,8 @@ import (
 	"github.com/Hullovv/egress/pkg/config"
 	"github.com/Hullovv/egress/pkg/errors"
 	"github.com/Hullovv/egress/pkg/gstreamer"
+	"github.com/Hullovv/egress/pkg/logging"
 	"github.com/Hullovv/egress/pkg/types"
-	"github.com/livekit/egress/pkg/logging"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
 )
@@ -179,7 +179,7 @@ func (sb *StreamBin) BuildStream(stream *config.Stream, framerate int32) (*Strea
 			proxy.SetChainFunction(func(self *gst.Pad, _ *gst.Object, buffer *gst.Buffer) gst.FlowReturn {
 				buffer.Ref()
 
-				if uint64(buffer.Duration())-videoFrameDuration < 2 && !buffer.HasFlags(gst.BufferFlagDeltaUnit) {
+				if uint64(*buffer.Duration().AsDuration())-videoFrameDuration < 2 && !buffer.HasFlags(gst.BufferFlagDeltaUnit) {
 					// non-delta video frame
 					ss.keyframes.Inc()
 				}

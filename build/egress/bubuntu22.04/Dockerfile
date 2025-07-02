@@ -60,9 +60,9 @@ RUN if [ "$TARGETPLATFORM" = "linux/arm64" ]; then GOARCH=arm64; else GOARCH=amd
 
 FROM hullovv/livekit-gstreamer-prod
 
-COPY build/egress/bubuntu22.04/install-dependencies /
-
-RUN /install-dependencies && apt remove -y libmpeg2-4 && \
+# COPY build/egress/bubuntu22.04/install-dependencies /
+# /install-dependencies && 
+RUN apt remove -y libmpeg2-4 && \
     apt update && apt-get install --reinstall -y --allow-change-held-packages \
     # libgstreamer-plugins-base1.0-dev \
     # libgstrtspserver-1.0-0 \
@@ -182,7 +182,6 @@ RUN /install-dependencies && apt remove -y libmpeg2-4 && \
     libzbar0 \
     libzvbi0 \
     mjpegtools \
-    nvidia-driver-535 \
     xdg-dbus-proxy && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*

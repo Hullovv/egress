@@ -45,7 +45,7 @@ type Bin struct {
 
 	added    bool
 	srcs     []*Bin                   // source bins
-	Elements []*gst.Element           // elements within this bin
+	elements []*gst.Element           // elements within this bin
 	queues   map[string]*gst.Element  // used with BinTypeMultiStream
 	pads     map[string]*gst.GhostPad // ghost pads by bin name
 	sinks    []*Bin                   // sink bins
@@ -67,13 +67,13 @@ func (b *Bin) GetName() string {
 
 // Add src as a source of b. This should only be called once for each source bin
 func (b *Bin) AddSourceBin(src *Bin) error {
-	logger.Infow(fmt.Sprintf("adding src %s to %s", src.bin.GetName(), b.bin.GetName()))
+	logger.Debugw(fmt.Sprintf("adding src %s to %s", src.bin.GetName(), b.bin.GetName()))
 	return b.addBin(src, gst.PadDirectionSource)
 }
 
 // Add src as a sink of b. This should only be called once for each sink bin
 func (b *Bin) AddSinkBin(sink *Bin) error {
-	logger.Infow(fmt.Sprintf("adding sink %s to %s", sink.bin.GetName(), b.bin.GetName()))
+	logger.Debugw(fmt.Sprintf("adding sink %s to %s", sink.bin.GetName(), b.bin.GetName()))
 	return b.addBin(sink, gst.PadDirectionSink)
 }
 
@@ -135,7 +135,7 @@ func (b *Bin) AddElement(e *gst.Element) error {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	b.Elements = append(b.Elements, e)
+	b.elements = append(b.elements, e)
 	if err := b.bin.Add(e); err != nil {
 		return errors.ErrGstPipelineError(err)
 	}
@@ -148,7 +148,7 @@ func (b *Bin) AddElements(elements ...*gst.Element) error {
 	b.mu.Lock()
 	defer b.mu.Unlock()
 
-	b.Elements = append(b.Elements, elements...)
+	b.elements = append(b.elements, elements...)
 	if err := b.bin.AddMany(elements...); err != nil {
 		return errors.ErrGstPipelineError(err)
 	}
@@ -240,7 +240,7 @@ func (b *Bin) probeRemoveSource(src *Bin) {
 	})
 
 	if _, err := glib.IdleAdd(func() bool {
-		b.Elements[0].ReleaseRequestPad(sinkPad)
+		b.elements[0].ReleaseRequestPad(sinkPad)
 		srcGhostPad.Unlink(sinkGhostPad.Pad)
 		b.bin.RemovePad(sinkGhostPad.Pad)
 		removed.Store(true)
@@ -283,7 +283,7 @@ func (b *Bin) probeRemoveSink(sink *Bin) {
 			logger.Warnw(fmt.Sprintf("failed to change %s state", sink.bin.GetName()), err)
 		}
 
-		b.Elements[len(b.Elements)-1].ReleaseRequestPad(srcGhostPad.GetTarget())
+		b.elements[len(b.elements)-1].ReleaseRequestPad(srcGhostPad.GetTarget())
 		b.bin.RemovePad(srcGhostPad.Pad)
 		return gst.PadProbeOK
 	})
@@ -380,7 +380,7 @@ func (b *Bin) sendEOS() {
 			}(src)
 		}
 		wg.Wait()
-	} else if len(b.Elements) > 0 {
+	} else if len(b.elements) > 0 {
 		b.bin.SendEvent(gst.NewEOSEvent())
 	}
 }
@@ -435,14 +435,14 @@ func (b *Bin) link() error {
 		}
 	}
 
-	if len(b.Elements) > 0 {
+	if len(b.elements) > 0 {
 		if b.linkFunc != nil {
 			if err := b.linkFunc(b.elements); err != nil {
 				return err
 			}
 		} else {
 			// link elements
-			if err := gst.ElementLinkMany(b.Elements...); err != nil {
+			if err := gst.ElementLinkMany(b.elements...); err != nil {
 				return errors.ErrGstPipelineError(err)
 			}
 		}
@@ -517,7 +517,7 @@ func linkPeersLocked(src, sink *Bin) error {
 			srcPad.AddProbe(gst.PadProbeTypeBlockDownstream, func(_ *gst.Pad, _ *gst.PadProbeInfo) gst.PadProbeReturn {
 				if err = sink.SetState(gst.StatePlaying); err != nil {
 					src.OnError(errors.ErrGstPipelineError(err))
-					return gst.PadProbeUnhandled
+					return gst.PadProbeHandled
 				}
 
 				return gst.PadProbeRemove
@@ -564,7 +564,7 @@ func (b *Bin) queueLinkPeersLocked(src, sink *Bin) error {
 func getPeerSrcs(srcs []*Bin) []*Bin {
 	flattened := make([]*Bin, 0, len(srcs))
 	for _, src := range srcs {
-		if len(src.Elements) > 0 {
+		if len(src.elements) > 0 {
 			flattened = append(flattened, src)
 		} else {
 			flattened = append(flattened, getPeerSrcs(src.srcs)...)
@@ -576,7 +576,7 @@ func getPeerSrcs(srcs []*Bin) []*Bin {
 func getPeerSinks(sinks []*Bin) []*Bin {
 	flattened := make([]*Bin, 0, len(sinks))
 	for _, sink := range sinks {
-		if len(sink.Elements) > 0 {
+		if len(sink.elements) > 0 {
 			flattened = append(flattened, sink)
 		} else {
 			flattened = append(flattened, getPeerSinks(sink.sinks)...)

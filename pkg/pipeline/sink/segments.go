@@ -30,7 +30,7 @@ import (
 	"github.com/Hullovv/egress/pkg/pipeline/sink/uploader"
 	"github.com/Hullovv/egress/pkg/stats"
 	"github.com/Hullovv/egress/pkg/types"
-	"github.com/livekit/egress/pkg/pipeline/builder"
+	"github.com/Hullovv/egress/pkg/pipeline/builder"
 	"github.com/livekit/protocol/logger"
 )
 

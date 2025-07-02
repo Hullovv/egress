@@ -19,17 +19,17 @@ import (
 	"path"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/Hullovv/egress/pkg/config"
+	"github.com/Hullovv/egress/pkg/errors"
 	"github.com/Hullovv/egress/pkg/stats"
 	"github.com/Hullovv/egress/pkg/types"
-	"github.com/livekit/egress/pkg/errors"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/psrpc"
 	"github.com/livekit/storage"
 )
+
+const presignedExpiration = time.Hour * 24 * 7 // 7 days
 
 type Uploader struct {
 	primary       *store
@@ -116,7 +116,7 @@ func uploadToProvider(s *store, localFilepath string, storageFilepath string, ou
 	}
 
 	if s.conf.GeneratePresignedUrl {
-		location, err = s.GeneratePresignedUrl(storageFilepath)
+		location, err = s.GeneratePresignedUrl(storageFilepath, presignedExpiration)
 		if err != nil {
 			return "", 0, errors.ErrUploadFailed(s.name, err)
 		}

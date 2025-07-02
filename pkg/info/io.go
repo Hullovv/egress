@@ -24,8 +24,8 @@ import (
 	"github.com/frostbyte73/core"
 	"go.uber.org/atomic"
 
-	"github.com/livekit/egress/pkg/config"
-	"github.com/livekit/egress/pkg/errors"
+	"github.com/Hullovv/egress/pkg/config"
+	"github.com/Hullovv/egress/pkg/errors"
 	"github.com/livekit/protocol/egress"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"

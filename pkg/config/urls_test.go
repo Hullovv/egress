@@ -21,7 +21,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/livekit/egress/pkg/types"
+	"github.com/Hullovv/egress/pkg/types"
 )
 
 func TestValidateUrl(t *testing.T) {

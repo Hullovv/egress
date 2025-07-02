@@ -17,7 +17,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/Hullovv/egress/pkg/service"
+	"github.com/Hullovv/egress/pkg/server"
 	"github.com/livekit/protocol/logger"
 )
 

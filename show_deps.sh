@@ -1,0 +1,3 @@
+#!/bin/bash
+
+PACKAGES="gst-device-monitor-1.0 gst-discoverer-1.0 gst-inspect-1.0 gst-launch-1.0 gst-play-1.0 gst-stats-1.0 gst-transcoder-1.0 gst-typefind-1.0"
