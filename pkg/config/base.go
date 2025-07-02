@@ -123,7 +123,7 @@ func (c *BaseConfig) initLogger(values ...interface{}) error {
 	return nil
 }
 
-func (c *BaseConfig) СheckGpu() bool {
+func (c *BaseConfig) СheckGpu() {
 	logger.Infow("Start check gpu")
 	var (
 		check bool
@@ -136,15 +136,15 @@ func (c *BaseConfig) СheckGpu() bool {
 		logger.Infow("Start check gpu GPU::", gpu_c)
 		if err != nil {
 			logger.Infow("Start check gpu ERROR:: ", err)
-			return false
+			c.UseGpu.Enabled = false
 		}
 		if len(gpu_c.GraphicsCards) != 0 {
-			return true
+			c.UseGpu.Enabled = true
 		} else {
 			// c.UseGpu.Enabled = false
-			return check
+			c.UseGpu.Enabled = check
 		}
 	} else {
-		return check
+		c.UseGpu.Enabled = check
 	}
 }

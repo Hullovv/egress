@@ -50,12 +50,12 @@ type VideoBin struct {
 
 func BuildVideoBin(pipeline *gstreamer.Pipeline, p *config.PipelineConfig) error {
 
-	logger.Infow("BuildVideoBin:: ")
-
 	b := &VideoBin{
 		bin:  pipeline.NewBin("video"),
 		conf: p,
 	}
+
+	b.conf.СheckGpu()
 
 	switch p.SourceType {
 	case types.SourceTypeWeb:
@@ -221,9 +221,7 @@ func (b *VideoBin) buildWebInput() error {
 		return errors.ErrGstPipelineError(err)
 	}
 	var converter, capsString string
-	check := b.conf.СheckGpu()
-	logger.Infow("Check GPU:::", check)
-	if check {
+	if b.conf.UseGpu.Enabled {
 		converter = "nvvideoconvert"
 		capsString = "video/x-raw(memory:NVMM),framerate=%d/1,format=(string)NV12"
 	} else {
@@ -546,8 +544,8 @@ func (b *VideoBin) addEncoder() error {
 		var x264Enc, h264parse, caps *gst.Element
 		var bufCapacity uint
 		var err error
-		check := b.conf.СheckGpu()
-		if check {
+
+		if b.conf.UseGpu.Enabled {
 			x264Enc, err = gst.NewElement("nvv4l2h264enc")
 		} else {
 			x264Enc, err = gst.NewElement("x264enc")
@@ -593,7 +591,7 @@ func (b *VideoBin) addEncoder() error {
 		if err != nil {
 			return errors.ErrGstPipelineError(err)
 		}
-		if check {
+		if b.conf.UseGpu.Enabled {
 			h264parse, err = gst.NewElement("h264parse")
 			if err != nil {
 				return errors.ErrGstPipelineError(err)
