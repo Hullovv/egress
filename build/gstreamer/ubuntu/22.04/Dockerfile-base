@@ -34,8 +34,8 @@ RUN wget https://libnice.freedesktop.org/releases/libnice-$LIBNICE_VERSION.tar.g
 COPY install-cuda /
 RUN /install-cuda
 
-RUN wget --content-disposition 'https://api.ngc.nvidia.com/v2/resources/org/nvidia/deepstream/6.4/files?redirect=true&path=deepstream-6.4_6.4.0-1_amd64.deb' -O deepstream-6.4_6.4.0-1_amd64.deb && \
-    dpkg -i ./deepstream-6.4_6.4.0-1_amd64.deb && \
-    rm ./deepstream-6.4_6.4.0-1_amd64.deb && \
-    apt-get clean &&\
-    rm -rf /var/lib/apt/lists/*
+# RUN wget --content-disposition 'https://api.ngc.nvidia.com/v2/resources/org/nvidia/deepstream/6.4/files?redirect=true&path=deepstream-6.4_6.4.0-1_amd64.deb' -O deepstream-6.4_6.4.0-1_amd64.deb && \
+#     dpkg -i ./deepstream-6.4_6.4.0-1_amd64.deb && \
+#     rm ./deepstream-6.4_6.4.0-1_amd64.deb && \
+#     apt-get clean &&\
+#     rm -rf /var/lib/apt/lists/*
