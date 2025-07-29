@@ -119,9 +119,9 @@ apt-get install -y --no-install-recommends \
   wget \
   xdg-dbus-proxy \
   python3-pip \
-  nvidia-driver-535 \
   software-properties-common \
   gpg-agent
+  # nvidia-driver-535 \
 
 # install rust
 curl -o install-rustup.sh --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs

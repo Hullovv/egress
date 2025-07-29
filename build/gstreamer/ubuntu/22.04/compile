@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euxo pipefail
 
+apt install meson --only-upgrade
+
 for repo in gstreamer libnice gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly gst-libav; do
   pushd $repo
 
